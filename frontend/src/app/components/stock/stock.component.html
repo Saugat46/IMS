@@ -1,0 +1,400 @@
+<div class="main">
+  <div class="pagetitle">
+    <h1>Stock</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="">Home</a></li>
+        <li class="breadcrumb-item active">Stock</li>
+      </ol>
+    </nav>
+  </div>
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card h-100">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <div class="d-flex gap-2">
+              <button class="btn btn-success" (click)="exportToExcel()">
+                <i class="fas fa-file-excel"></i>
+                &nbsp;Export Stock
+              </button>
+              <button class="btn btn-light" (click)="reloadWebsite()">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+            <div class="d-flex align-items-center">
+              <label for="searchBar" class="me-2">Search:</label>
+              <input
+                type="text"
+                id="searchBar"
+                [(ngModel)]="searchTerm"
+                placeholder="Enter product name"
+                class="form-control"
+                (input)="filterStock($event)"
+              />
+            </div>
+          </div>
+          <div class="card-body overflow-auto" style="max-height: 300px">
+            <h5 class="card-title">Stocks</h5>
+            <table
+              class="table table-hover table-responsive align-items-center text-center"
+            >
+              <thead class="sticky-top">
+                <tr>
+                  <th>S.N</th>
+                  <th>Product Name</th>
+                  <th>Code</th>
+                  <th>Qty</th>
+                  <th>Purchase Price</th>
+                  <th>Selling Price</th>
+                  <th>Category Code</th>
+                  <th>Vendor</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let stockItem of filteredStock; let i = index"
+                  class="cursor-pointer"
+                  [ngClass]="{
+                    'table-warning': stockItem.quantity < 50,
+                    'table-success': stockItem.quantity >= 50,
+                    'table-danger': stockItem.quantity === 0
+                  }"
+                >
+                  <th scope="row">{{ i + 1 }}</th>
+                  <td>{{ stockItem.name }}</td>
+                  <td>{{ stockItem.code }}</td>
+                  <td>{{ stockItem.quantity }}</td>
+                  <td>{{ stockItem.bprice }}</td>
+                  <td>{{ stockItem.sprice }}</td>
+                  <td>{{ stockItem.categoryCode }}</td>
+                  <td>{{ stockItem.sname }}</td>
+                  <td>
+                    <div>
+                      <button
+                        type="button"
+                        class="btn btn-info btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#exampleModal"
+                        (click)="editStock(i)"
+                      >
+                        <i class="fas fa-eye"></i>&nbsp;View
+                      </button>
+                      <span>|</span>
+                      <span *ngIf="roll() === 'ADMIN' || 'EDITOR'">
+                        <button
+                          type="button"
+                          class="btn btn-secondary btn-sm"
+                          data-bs-toggle="modal"we
+                          data-bs-target="#exampleModal"
+                          data-bs-target="#editModal"
+                          (click)="editStock(i)"
+                        >
+                        <i class="fas fa-edit"></i>
+                        Edit
+                        </button>
+                        <span>|</span>
+                      </span>
+                      <button
+                        type="button"
+                        class="btn btn-danger btn-sm"
+                        (click)="removeStock(i)"
+                      >
+                        <i class="fas fa-trash"></i>&nbsp;Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- edit modal -->
+  <div
+    class="modal fade"
+    id="editModal"
+    tabindex="-1"
+    aria-labelledby="editModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Edit Stock</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <!-- Edit Form -->
+          <form novalidat (ngSubmit)="saveUpdatedStock()">
+            <div class="mb-3">
+              <label for="editProductName" class="form-label"
+                >Product Name</label
+              >
+              <input
+                type="text"
+                id="editProductName"
+                class="form-control"
+                required
+                [(ngModel)]="productInfo.name"
+                name="productName"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editProductCode" class="form-label">Code</label>
+              <input
+                type="text"
+                id="editProductCode"
+                class="form-control"
+                required
+                [(ngModel)]="productInfo.code"
+                name="productCode"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editProductQty" class="form-label">Qty</label>
+              <input
+                type="number"
+                id="editProductQty"
+                class="form-control"
+                required
+                [(ngModel)]="productInfo.quantity"
+                name="productQty"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editPurchasePrice" class="form-label"
+                >Purchase Price</label
+              >
+              <input
+                type="number"
+                id="editPurchasePrice"
+                class="form-control"
+                required
+                [(ngModel)]="productInfo.bprice"
+                name="PurchasePrice"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editSellingPrice" class="form-label"
+                >Selling Price</label
+              >
+              <input
+                type="number"
+                id="editSellingPrice"
+                class="form-control"
+                required
+                [(ngModel)]="productInfo.sprice"
+                name="sellingPrice"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editCategoryCode" class="form-label"
+                >Category Code</label
+              >
+              <input
+                type="text"
+                id="editCategoryCode"
+                class="form-control"
+                required
+                [(ngModel)]="productInfo.categoryCode"
+                name="categoryCode"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editVendor" class="form-label">Vendor Name</label>
+              <input
+                type="text"
+                id="editVendor"
+                class="form-control"
+                required
+                [(ngModel)]="productInfo.sname"
+                name="vendorName"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editVendor" class="form-label">Vendor Email</label>
+              <input
+                type="text"
+                id="editVendor"
+                class="form-control"
+                required
+                [(ngModel)]="productInfo.semail"
+                name="vendorEmail"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editVendor" class="form-label">Vendor Contact</label>
+              <input
+                type="text"
+                id="editVendor"
+                class="form-control"
+                required
+                [(ngModel)]="productInfo.scontact"
+                name="vendorContact"
+              />
+            </div>
+            <!-- You can add more fields here for editing -->
+          </form>
+          <!-- End Edit Form -->
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            (click)="saveUpdatedStock()"
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal for Product Details -->
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+  #saleDetailsModal
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title" id="exampleModalLabel">Product Details</h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row d-flex">
+          <div class="col-12 col-md-6">
+            <!-- Product Information Section -->
+            <h3>Product Information</h3>
+            <p>
+              <strong>Name: </strong>
+              <span id="productName">{{ productInfo.name || "NA" }}</span>
+            </p>
+            <p>
+              <strong>Code: </strong>
+              <span id="productCode">{{ productInfo.code || "NA" }}</span>
+            </p>
+            <p>
+              <strong>Category Code: </strong>
+              <span id="categoryCode">{{
+                productInfo.categoryCode || "NA"
+              }}</span>
+            </p>
+            <p>
+              <strong>Quantity: </strong>
+              <span id="quantity">{{ productInfo.quantity || "NA" }}</span>
+            </p>
+            <p>
+              <strong>Per Unit Cost: </strong>
+              <span id="unitCost">
+                <i class="bi bi-currency-rupee"></i>
+                {{ productInfo.bprice || "NA" }}
+              </span>
+            </p>
+            <p>
+              <strong>Selling Price: </strong>
+              <span id="unitCost">
+                <i class="bi bi-currency-rupee"></i>
+                {{ productInfo.sprice || "NA" }} /unit
+              </span>
+            </p>
+          </div>
+          <div class="col-12 col-md-6">
+            <!-- Vendor Information Section -->
+            <h3>Vendor Information</h3>
+            <p>
+              <strong>Name: </strong>
+              <span id="customerName">{{ productInfo.sname || "NA" }}</span>
+            </p>
+            <p>
+              <strong>Contact: </strong>
+              <span id="customerContact">{{ productInfo.semail || "NA" }}</span>
+            </p>
+            <p>
+              <strong>Email: </strong>
+              <span id="customerEmail">{{ productInfo.scontact || "NA" }}</span>
+            </p>
+            <p>
+              <strong>Address: </strong>
+              <span id="customerAddress">{{
+                productInfo.saddress || "NA"
+              }}</span>
+            </p>
+          </div>
+          <div class="col-12">
+            <!-- Visual separation line -->
+            <hr style="border-color: #ccc" />
+            <h3>Additional Information</h3>
+            <p>
+              <strong>Processed By: </strong
+              ><span id="processedBy">{{ productInfo.userName }}</span>
+            </p>
+            <p>
+              <strong>CreatedAt: </strong
+              ><span id="createdAt">{{
+                productInfo.createdAt | date : "yyyy-MM-dd"
+              }}</span>
+            </p>
+            <p>
+              <strong>UpdatedAt: </strong
+              ><span id="updatedAt">{{
+                productInfo.updatedAt | date : "yyyy-MM-dd"
+              }}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" (click)="printSaleDetails()">
+          <i class="fas fa-download"></i>
+          &nbsp;Download
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+      <!-- New section for printing -->
+      <div class="modal-print-section d-none">
+        <h3>Sale Details for Printing</h3>
+        <!-- Display the information you want to include in the printed document here -->
+        <p>
+          <strong>Name: </strong
+          ><span id="printProductName">{{ productInfo.name }}</span>
+        </p>
+        <p>
+          <strong>Code: </strong
+          ><span id="printProductCode">{{ productInfo.code }}</span>
+        </p>
+        <!-- Add more information for printing as needed -->
+      </div>
+    </div>
+  </div>
+</div>

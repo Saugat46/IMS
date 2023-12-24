@@ -1,0 +1,276 @@
+<div class="main">
+  <div class="pagetitle">
+    <h1>Category</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="">Home</a></li>
+        <li class="breadcrumb-item active">Category</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card h-100">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <div class="d-flex gap-2">
+              <button
+                type="button"
+                class="btn btn-primary"
+                data-toggle="modal"
+                data-target="#saleForm"
+                *ngIf="roll() === 'ADMIN' || roll() === 'EDITOR'"
+              >
+                <i class="fas fa-plus"></i>
+                &nbsp;Add Category
+              </button>
+              <button class="btn btn-success" (click)="exportToExcel()">
+                <i class="fas fa-file-excel"></i>
+                &nbsp;Export Category
+              </button>
+              <button class="btn btn-light" (click)="reloadWebsite()">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+            <div class="d-flex align-items-center">
+              <label for="searchBar" class="me-2">Search:</label>
+              <input
+                type="text"
+                id="searchBar"
+                placeholder="Enter category"
+                class="form-control"
+                [(ngModel)]="searchTerm"
+                (input)="searchCategories()"
+              />
+            </div>
+          </div>
+          <div class="card-body overflow-auto" style="max-height: 300px">
+            <h5 class="card-title">Stocks</h5>
+            <table class="table table-hover align-items-center text-center">
+              <thead class="sticky-top">
+                <tr>
+                  <th>S.N</th>
+                  <th>Category Name</th>
+                  <th>Code</th> 
+                  <th>Available Volume</th>
+                  <th>Shell No</th>
+                  <th *ngIf="roll() === 'ADMIN' || roll() === 'EDITOR'">Action</th>
+                </tr>
+              </thead>
+              <tbody class="">
+                <tr
+                  *ngFor="let category of categories; let i = index"
+                  (click)="selectCategory(category)"
+                  class="cursor-pointer"
+                >
+                  <th>{{ i + 1 }}</th>
+                  <td>{{ category.name }}</td>
+                  <td>{{ category.code }}</td> 
+                  <td>{{ category.volume }}</td>
+                  <td>{{ category.catNum }}</td>
+                  <td>
+                    <div>
+                      <span *ngIf="roll() === 'ADMIN' || roll() === 'EDITOR'">
+                        <button
+                          type="button"
+                          class="btn btn-secondary btn-sm"
+                          data-bs-toggle="modal"
+                          data-bs-target="#updateForm"
+                        >
+                          <i class="fas fa-edit"></i>&nbsp;Edit
+                        </button></span
+                      >
+                      <span *ngIf="roll() === 'ADMIN'">
+                        <span>|</span>
+                        <button
+                          type="button"
+                          class="btn btn-danger btn-sm"
+                          data-bs-toggle="modal"
+                          data-bs-target="#exampleModal"
+                          (click)="removeCategory(i)"
+                        >
+                          <i class="fas fa-trash"></i>&nbsp;Delete
+                        </button></span
+                      >
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <nav class="card-footer">
+            <ul class="pagination justify-content-center">
+              <!-- Pagination buttons can be added here if needed -->
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End of breedcom -->
+</div>
+
+<!-- add category -->
+<div
+  class="modal fade"
+  id="saleForm"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="saleForm"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content p-3 ">
+      <div class="modal-header ">
+        <h5 class="modal-title" id="saleForm">Add Category</h5>
+        <button type="button" class="btn-close" data-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form novalidate (ngSubmit)="newCategory()">
+          <div class="mb-3">
+            <label for="productName" class="form-label">Category Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="productName"
+              name="categoryName"
+              required
+              [(ngModel)]="addedCategory.name"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="quantity" class="form-label">Code</label>
+            <input
+              type="text"
+              class="form-control"
+              id="quantity"
+              name="categoryCode"
+              required
+              [(ngModel)]="addedCategory.code"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="customerEmail" class="form-label">Volume</label>
+            <input
+              type="number"
+              class="form-control"
+              id="customerEmail"
+              name="categoryVolume"
+              required
+              [(ngModel)]="addedCategory.volume"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="customerAddress" class="form-label">Shell No</label>
+            <input
+              type="text"
+              class="form-control"
+              id="customerAddress"
+              name="categorycatNum"
+              required
+              [(ngModel)]="addedCategory.catNum"
+            />
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- update category -->
+
+<div
+  class="modal fade"
+  id="updateForm"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="saleForm"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content p-3">
+      <div class="modal-header ">
+        <h5 class="modal-title" id="saleForm">Update Category</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form novalidate (ngSubmit)="updateCategory()">
+          <div class="mb-3">
+            <label for="productName" class="form-label">Category Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="productName"
+              name="categoryName"
+              required
+              [(ngModel)]="selectedCategory.name"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="quantity" class="form-label">Code</label>
+            <input
+              type="text"
+              class="form-control"
+              id="quantity"
+              name="categoryCode"
+              required
+              [(ngModel)]="selectedCategory.code"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="customerEmail" class="form-label">Volume</label>
+            <input
+              type="number"
+              class="form-control"
+              id="customerEmail"
+              name="categoryVolume"
+              required
+              [(ngModel)]="selectedCategory.volume"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="customerAddress" class="form-label">Shell No</label>
+            <input
+              type="text"
+              class="form-control"
+              id="customerAddress"
+              name="categorycatNum"
+              required
+              [(ngModel)]="selectedCategory.catNum"
+            />
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

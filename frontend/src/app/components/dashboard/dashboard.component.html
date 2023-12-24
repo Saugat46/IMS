@@ -1,0 +1,272 @@
+<div class="pagetitle">
+  <h1>Dashboard</h1>
+  <nav>
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a routerLink="">Home</a></li>
+      <li class="breadcrumb-item active">Dashboard</li>
+    </ol>
+  </nav>
+</div>
+<!-- End Page Title -->
+
+<section class="section dashboard">
+  <div class="row">
+    <!-- Left side columns -->
+    <div class="col">
+      <div class="row">
+        <!-- Sales Card -->
+        <div class="col-xxl-4 col-md-6">
+          <div class="card info-card sales-card">
+            <div class="card-body">
+              <h5 class="card-title">Sales <span>| Total</span></h5>
+
+              <div class="d-flex align-items-center">
+                <div
+                  class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                >
+                  <i class="bi bi-cart"></i>
+                </div>
+                <div class="ps-3">
+                  <h6>{{ totalSale }}</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Sales Card -->
+
+        <!-- Revenue Card -->
+        <div class="col-xxl-4 col-md-6">
+          <div class="card info-card revenue-card">
+            <div class="card-body">
+              <h5 class="card-title">Revenue <span>| Total</span></h5>
+
+              <div class="d-flex align-items-center">
+                <div
+                  class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                >
+                  <i class="bi bi-currency-rupee"></i>
+                </div>
+                <div class="ps-3">
+                  <h6>{{ revenue }}</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Revenue Card -->
+
+        <!-- Customers Card -->
+        <div class="col-xxl-4 col-xl-12">
+          <div class="card info-card customers-card">
+            <div class="card-body">
+              <h5 class="card-title">Customers <span>| Total</span></h5>
+
+              <div class="d-flex align-items-center">
+                <div
+                  class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                >
+                  <i class="bi bi-people"></i>
+                </div>
+                <div class="ps-3">
+                  <h6>{{ totalCustomerCount }}</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Customers Card -->
+
+        <!-- Recent Sales -->
+        <section class="section">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="card h-100">
+                <div class="card-body overflow-auto" style="max-height: 300px">
+                  <h5 class="card-title">Top Selling</h5>
+                  <table
+                    class="table table-hover align-items-center text-center"
+                  >
+                    <thead class="sticky-top">
+                      <tr>
+                        <th>Rank</th>
+                        <th>Product Name</th>
+                        <th>Qty</th>
+                        <th>Total Price</th>
+                        <th>Customer</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        *ngFor="let sale of sales; let i = index"
+                        class="cursor-pointer"
+                      >
+                        <th scope="row">{{ i + 1 }}</th>
+                        <td>{{ sale.detail }}</td>
+                        <td>{{ sale.quantity }}</td>
+                        <td>
+                          <i class="bi bi-currency-rupee"></i>
+                          {{ sale.totalPrice }}
+                        </td>
+                        <td>{{ sale.bname }}</td>
+                        <td>
+                          <div>
+                            <button
+                              type="button"
+                              class="btn btn-info btn-sm"
+                              data-bs-toggle="modal"
+                              data-bs-target="#exampleModal"
+                              (click)="view(i)"
+                            >
+                              <i class="fas fa-eye"></i>&nbsp;View
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <nav class="card-footer">
+                  <ul class="pagination justify-content-center">
+                    <!-- <li class="page-item" *ngFor="let pageNumber of totalPages">
+              <a class="page-link" (click)="changePage(pageNumber)">{{ pageNumber }}</a>
+            </li> -->
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- End Recent Sales -->
+      </div>
+    </div>
+    <!-- End Left side columns -->
+  </div>
+</section>
+<!-- End #main -->
+<!-- Modal for Sale Details -->
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+  #saleDetailsModal
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title" id="exampleModalLabel">Sale Details</h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row d-flex">
+          <div class="col-12 col-md-6">
+            <!-- Product Information Section -->
+            <h3>Product Information</h3>
+            <p>
+              <strong>Name: </strong
+              ><span id="productName">{{ productInfo.name }}</span>
+            </p>
+            <p>
+              <strong>Code: </strong
+              ><span id="productCode">{{ productInfo.code }}</span>
+            </p>
+            <p>
+              <strong>Category Code: </strong
+              ><span id="categoryCode">{{ productInfo.categoryCode }}</span>
+            </p>
+            <p>
+              <strong>Quantity: </strong
+              ><span id="quantity">{{ salesDetail.quantity }}</span>
+            </p>
+            <p>
+              <strong>Per Unit Cost: </strong
+              ><span id="unitCost"
+                ><i class="bi bi-currency-rupee"></i
+                >{{ productInfo.sprice }}</span
+              >
+            </p>
+            <!-- Add more product details here as needed -->
+          </div>
+          <div class="col-12 col-md-6">
+            <!-- Customer Information Section -->
+            <h3>Customer Information</h3>
+            <p>
+              <strong>Name: </strong
+              ><span id="customerName">{{ salesDetail.bname }}</span>
+            </p>
+            <p>
+              <strong>Contact: </strong
+              ><span id="customerContact">{{ salesDetail.bcontact }}</span>
+            </p>
+            <p>
+              <strong>Email: </strong
+              ><span id="customerEmail">{{ salesDetail.bemail }}</span>
+            </p>
+            <p>
+              <strong>Address: </strong
+              ><span id="customerAddress">{{ salesDetail.baddress }}</span>
+            </p>
+            <!-- Add more customer details here as needed -->
+          </div>
+          <div class="col-12">
+            <!-- Visual separation line -->
+            <hr style="border-color: #ccc" />
+            <h3>Additional Information</h3>
+            <p>
+              <strong>Processed By: </strong
+              ><span id="processedBy">{{ userInfo.name }}</span>
+            </p>
+            <p>
+              <strong>Total Cost: </strong><i class="bi bi-currency-rupee"></i
+              ><span id="totalCost">{{ salesDetail.totalPrice }}</span>
+            </p>
+            <p>
+              <strong>Date: </strong
+              ><span id="saleDate">{{
+                salesDetail.createdAt | date : "yyyy-MM-dd"
+              }}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" (click)="printSaleDetails()">
+          <i class="fas fa-download"></i>
+          &nbsp;Download
+        </button>
+        <button class="btn btn-success" (click)="exportToExcel()">
+          <i class="fas fa-file-excel"></i>
+          &nbsp;Export
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+      <!-- New section for printing -->
+      <div class="modal-print-section d-none">
+        <h3>Sale Details for Printing</h3>
+        <!-- Display the information you want to include in the printed document here -->
+        <p>
+          <strong>Name: </strong
+          ><span id="printProductName">{{ productInfo.name }}</span>
+        </p>
+        <p>
+          <strong>Code: </strong
+          ><span id="printProductCode">{{ productInfo.code }}</span>
+        </p>
+        <!-- Add more information for printing as needed -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ... (other content) ... -->

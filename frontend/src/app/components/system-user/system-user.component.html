@@ -1,0 +1,322 @@
+<!-- user-list.component.html -->
+
+<div class="main">
+  <div class="pagetitle">
+    <h1>System Users</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="">Home</a></li>
+        <li class="breadcrumb-item active">System Users</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End of breedcom -->
+  <section class="section">
+    <div class="row">
+      <!-- User List Table -->
+      <div class="col-lg-12">
+        <div class="card h-100">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <div class="d-flex gap-2">
+              <button
+                type="button"
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#addUser"
+              >
+                <i class="fas fa-user-plus"></i>&nbsp; Add User
+              </button>
+              <button class="btn btn-success" (click)="exportToExcel()">
+                <i class="fas fa-file-excel"></i>
+                &nbsp;Export User
+              </button>
+              <button class="btn btn-light" (click)="reloadWebsite()">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+            <div class="d-flex align-items-center">
+              <label for="searchBar" class="me-2">Search:</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter User"
+                [(ngModel)]="searchTerm"
+                (ngModelChange)="filterUsers()"
+              />
+            </div>
+          </div>
+          <div class="card-body overflow-auto" style="max-height: 400px">
+            <h5 class="card-title">User List</h5>
+            <table class="table table-hover align-items-center text-center">
+              <thead class="sticky-top">
+                <tr>
+                  <th>S.N</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Address</th>
+                  <th>Phone</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let user of users; let i = index"
+                  (click)="selectUser(user)"
+                  class="cursor-pointer"
+                >
+                  <th scope="row">{{ i + 1 }}</th>
+                  <td>{{ user.name }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ user.roles.join(", ") }}</td>
+                  <td>{{ user.address }}</td>
+                  <td>{{ user.phone }}</td>
+                  <td>
+                    <button
+                      type="button"
+                      class="btn btn-secondary btn-sm"
+                      data-bs-toggle="modal"
+                      data-bs-target="#updateModal"
+                    >
+                      <i class="fas fa-edit"></i>&nbsp; Edit
+                    </button>
+                    <span>|</span>
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-sm"
+                      (click)="deleteUser(i)"
+                    >
+                      <i class="fas fa-trash"></i>&nbsp; Delete
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- End of user list table -->
+    </div>
+  </section>
+</div>
+
+<!--Update User Modal -->
+
+<div
+  class="modal fade"
+  id="updateModal"
+  tabindex="-1"
+  aria-labelledby="updateModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="card-title">Update User</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <!-- Horizontal Form -->
+        <form class="needs-validation" novalidate (ngSubmit)="updateUser()">
+          <div class="row mb-3">
+            <label class="col-sm-3 col-form-label">Name</label>
+            <div class="col">
+              <input
+                name="name"
+                type="text"
+                class="form-control"
+                [(ngModel)]="selectedUser.name"
+                required
+              />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label for="inputEmail3" class="col-sm-3 col-form-label"
+              >Email</label
+            >
+            <div class="col">
+              <input
+                type="email"
+                name="email"
+                class="form-control"
+                id="inputEmail"
+                [(ngModel)]="selectedUser.email"
+                required
+              />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-3 col-form-label">Password</label>
+            <div class="col">
+              <input
+                name="password"
+                type="password"
+                class="form-control"
+                [(ngModel)]="selectedUser.password"
+                required
+              />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-3 col-form-label">Address</label>
+            <div class="col">
+              <input
+                name="address"
+                type="text"
+                class="form-control"
+                [(ngModel)]="selectedUser.address"
+                required
+              />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-3 col-form-label">Phone</label>
+            <div class="col">
+              <input
+                name="phone"
+                type="text"
+                class="form-control"
+                [(ngModel)]="selectedUser.phone"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label class="col-sm-3 col-form-label">Roles</label>
+            <div class="col">
+              <ng-select
+                [items]="roleMappings"
+                bindLabel="name"
+                bindValue="id"
+                [multiple]="true"
+                [(ngModel)]="selectedUser.roleIds"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="updateSelectedRoles($event)"
+              ></ng-select>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="submit" class="btn btn-primary">Update</button>
+          </div>
+        </form>
+        <!-- End Horizontal Form -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="addUser"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add User</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form class="needs-validation" novalidate (ngSubmit)="registerUser()">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              name="name"
+              [(ngModel)]="newUser.name"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="inputEmail" class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="inputEmail"
+              name="email"
+              [(ngModel)]="newUser.email"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              [(ngModel)]="newUser.password"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="address" class="form-label">Address</label>
+            <input
+              type="text"
+              class="form-control"
+              id="address"
+              name="address"
+              [(ngModel)]="newUser.address"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="phone" class="form-label">Phone</label>
+            <input
+              type="text"
+              class="form-control"
+              id="phone"
+              name="phone"
+              [(ngModel)]="newUser.phone"
+              required
+            />
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              *ngIf="!isNewUser"
+              (click)="clearForm()"
+            >
+              Clear
+            </button>
+            <button type="submit" class="btn btn-primary">Add</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

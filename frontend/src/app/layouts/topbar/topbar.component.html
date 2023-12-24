@@ -1,0 +1,62 @@
+<header
+  class="header fixed-top d-flex align-items-center justify-content-center"
+>
+  <div class="d-flex align-items-center justify-content-center">
+    <a routerLink="" class="logo d-flex align-items-center">
+      <img src="../../../assets/img/favicon.png" alt="ims" />
+      <span class="d-flex">IMS</span>
+    </a>
+  </div>
+  <!-- End Logo -->
+
+  <nav class="header-nav ms-auto">
+    <ul class="d-flex align-items-center">
+      <!-- Notification Dropdown Icon -->
+      <li class="pe-3">
+        <div class="dropdown">
+          <a
+            class="btn btn-link btn-lg d-flex align-items-center"
+            href="#"
+            role="button"
+            id="notificationDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            style="text-decoration: none"
+          >
+            <i class="bi bi-bell m-0 position-relative">
+              <!-- Add m-0 to remove margin -->
+              <span
+                class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle"
+              >
+                0
+              </span>
+              <!-- Add badge class to position and style the badge -->
+            </i>
+          </a>
+          <ul
+            class="dropdown-menu dropdown-menu-end"
+            aria-labelledby="notificationDropdown"
+          >
+            <!-- Notification items go here -->
+            <li><a class="dropdown-item" href="#"> </a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <a class="dropdown-item" href="#">View All Notifications</a>
+            </li>
+          </ul>
+        </div>
+      </li>
+      <!-- End Notification Dropdown Icon -->
+
+      <li class="pe-3">
+        <button
+          class="btn btn-danger btn-sm d-flex align-items-center"
+          (click)="logout()"
+        >
+          <span>Sign Out</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+  <!-- End Icons Navigation -->
+</header>

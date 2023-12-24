@@ -1,0 +1,71 @@
+<div class="main">
+  <div class="pagetitle">
+    <h1>Customer Details</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="">Home</a></li>
+        <li class="breadcrumb-item active">Customer Details</li>
+      </ol>
+    </nav>
+  </div>
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card h-100">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <div class="d-flex gap-2">
+              <button class="btn btn-success" (click)="exportToExcel()">
+                <i class="fas fa-file-excel"></i>
+                &nbsp;Export Customer
+              </button>
+              <button class="btn btn-light" (click)="reloadWebsite()">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+            <div class="d-flex align-items-center">
+              <label for="searchBar" class="me-2">Search:</label>
+              <input
+                type="text"
+                id="searchBar"
+                placeholder="Enter customer detail"
+                class="form-control"
+                [(ngModel)]="searchTerm"
+                (keyup)="searchCustomers()"
+              />
+            </div>
+          </div>
+          <div class="card-body overflow-auto" style="max-height: 300px">
+            <h5 class="card-title">Customers</h5>
+            <table class="table table-hover align-items-center text-center">
+              <thead class="sticky-top">
+                <tr>
+                  <th>S.N</th>
+                  <th>Customer Name</th>
+                  <th>Email</th>
+                  <th>Address</th>
+                  <th>Contact</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let customer of filteredCustomers; let i = index">
+                  <th>{{ i + 1 }}</th>
+                  <td>{{ customer.bname }}</td>
+                  <td>{{ customer.bemail }}</td>
+                  <td>{{ customer.baddress }}</td>
+                  <td>{{ customer.bcontact }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <nav class="card-footer">
+            <ul class="pagination justify-content-center">
+              <!-- Pagination buttons can be added here if needed -->
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

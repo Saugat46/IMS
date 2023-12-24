@@ -1,0 +1,344 @@
+<div class="main">
+  <div class="pagetitle">
+    <h1>Sell Product</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="">Home</a></li>
+        <li class="breadcrumb-item active">Sell Product</li>
+      </ol>
+    </nav>
+
+    <!-- End of breedcom -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card h-100">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <div class="d-flex gap-2">
+                <button
+                  type="button"
+                  class="btn btn-warning"
+                  data-toggle="modal"
+                  data-target="#saleForm"
+                  *ngIf="roll() === 'USER' || roll() === 'EDITOR'"
+                >
+                  <i class="fas fa-shopping-cart"></i>
+                  &nbsp;Sell Product
+                </button>
+
+                <button
+                  class="btn btn-success excel-button"
+                  (click)="exportToExcel()"
+                >
+                  <i class="fas fa-file-excel"></i>
+                  &nbsp;Export Sale
+                </button>
+                <button class="btn btn-light" (click)="reloadWebsite()">
+                  <i class="fas fa-sync-alt"></i>
+                </button>
+              </div>
+              <div class="d-flex align-items-center">
+                <label for="searchBar" class="me-2">Search:</label>
+                <input
+                  type="text"
+                  id="searchBar"
+                  placeholder="Enter product name"
+                  class="form-control"
+                />
+              </div>
+            </div>
+            <div class="card-body overflow-auto" style="max-height: 300px">
+              <h5 class="card-title">Recent Sale</h5>
+              <table class="table table-hover align-items-center text-center">
+                <thead class="sticky-top">
+                  <tr>
+                    <th>S.N</th>
+                    <th>Product Name</th>
+                    <th>Qty</th>
+                    <th>Selling Price</th>
+                    <th>Customer Name</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    *ngFor="let sale of sales; let i = index"
+                    class="cursor-pointer"
+                  >
+                    <th scope="row">{{ i + 1 }}</th>
+                    <td>{{ sale.detail }}</td>
+                    <td>{{ sale.quantity }}</td>
+                    <td>
+                      <i class="bi bi-currency-rupee"></i> {{ sale.totalPrice }}
+                    </td>
+                    <td>{{ sale.bname }}</td>
+                    <td>
+                      <div>
+                        <button
+                          type="button"
+                          class="btn btn-primary btn-sm"
+                          data-bs-toggle="modal"
+                          data-bs-target="#Invoice"
+                          (click)="invoice(i)"
+                        >
+                          <i class="bi bi-file-earmark-text"></i>&nbsp;Invoice
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <nav class="card-footer">
+              <ul class="pagination justify-content-center">
+                <!-- Pagination buttons can be added here if needed -->
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<!-- Model -->
+<div
+  class="modal fade"
+  id="saleForm"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="saleForm"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title" id="saleForm">Sell Product</h5>
+        <button type="button" class="btn-close" data-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form #sellForm="ngForm" (ngSubmit)="sellProduct()" novalidate>
+          <div class="mb-3">
+            <label for="productName" class="form-label">Product Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="productName"
+              required
+              list="productSuggestions"
+              name="productName"
+              [(ngModel)]="saleData.name"
+              (input)="onProductSelect($event)"
+            />
+            <datalist id="productSuggestions">
+              <option
+                *ngFor="let product of productData"
+                [value]="product.name"
+              ></option> 
+            </datalist> 
+          </div>
+          <div class="mb-3">
+            <label for="productCode" class="form-label">Code</label>
+            <input
+              type="text"
+              class="form-control"
+              id="productCode"
+              name="productCode"
+              required
+              [(ngModel)]="saleData.code"
+              [readonly]="true"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="quantity" class="form-label">Quantity</label>
+            <input
+              type="number"
+              class="form-control"
+              id="quantity"
+              [placeholder]="stockQuantity + ' in stock'"
+              required
+              name="saleQuantity"
+              [(ngModel)]="saleData.quantity"
+              (input)="saleQuantity = saleData.quantity"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="customerName" class="form-label">Customer Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="customerName"
+              required
+              name="customerName"
+              [(ngModel)]="saleData.bname"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="customerEmail" class="form-label">Customer Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="customerEmail"
+              required
+              name="customerEmail"
+              [(ngModel)]="saleData.bemail"
+            />
+            <datalist id="customerEmail">
+              <option *ngFor="let sale of sales" [value]="sale.bemail"></option>
+            </datalist>
+          </div>
+          <div class="mb-3">
+            <label for="customerAddress" class="form-label"
+              >Customer Address</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="customerAddress"
+              required
+              name="customerAddress"
+              [(ngModel)]="saleData.baddress"
+            />
+            <datalist id="customerAddress">
+              <option
+                *ngFor="let sale of sales"
+                [value]="sale.baddress"
+              ></option>
+            </datalist>
+          </div>
+          <div class="mb-3">
+            <label for="customerContact" class="form-label"
+              >Customer Contact</label
+            >
+            <input
+              type="tel"
+              class="form-control"
+              id="customerContact"
+              required
+              name="customerContact"
+              [(ngModel)]="saleData.bcontact"
+            />
+            <datalist id="customerContact">
+              <option
+                *ngFor="let sale of sales"
+                [value]="sale.bcontact"
+              ></option>
+            </datalist>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="
+                !sellForm.valid ||
+                stockQuantity <= 0 ||
+                !saleQuantity ||
+                saleQuantity > stockQuantity
+              "
+            >
+              Save changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- bill model -->
+<div
+  class="modal fade"
+  id="Invoice"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title" id="exampleModalLabel">INVOICE</h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row d-flex">
+          <div class="col-12 col-md-12">
+            <!-- Invoice Information Section -->
+            <p>Company: Jadiya Warehouse and Supply</p>
+            <p>Tel: 985854635</p>
+            <p>Date: {{ salesDetailsById.createdAt | date : "yyyy-MM-dd" }}</p>
+            <p>Invoice Number: INV-2023-001</p>
+            <!-- Replace with your actual invoice number -->
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Quantity</th>
+                  <th>Unit Price</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ productInfoById.name }}</td>
+                  <td>{{ salesDetailsById.quantity }}</td>
+                  <td>{{ productInfoById.sprice }}</td>
+                  <td>{{ salesDetailsById.totalPrice }}</td>
+                </tr>
+                <!-- Add more rows for additional items -->
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" class="text-end">Subtotal</td>
+                  <td>{{ salesDetailsById.totalPrice }}</td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="text-end">Tax (13%)</td>
+                  <td>-</td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="text-end">Total</td>
+                  <td>{{ salesDetailsById.totalPrice }}</td>
+                </tr>
+              </tfoot>
+            </table>
+
+            <!-- Signature Section -->
+            <p>Processed By: {{ userInfo.name | uppercase }}</p>
+            <div class="signature float-end">
+              <p>Authorized Signature</p>
+              <img
+                src="../../../assets/img/signature.jpg"
+                alt="Signature"
+                width="150"
+                height="60"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary">
+          <i class="fas fa-download"></i>
+          &nbsp;Download
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
